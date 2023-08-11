@@ -1,5 +1,5 @@
 import threading
-from typing import Any, Iterable
+from typing import Any, Dict, Iterable
 
 
 class Counter:
@@ -42,3 +42,25 @@ class LocalList(threading.local):
 
     def __iter__(self):
         return iter(self._list)
+
+
+class UnsafeThreadLocal:
+
+    @property
+    def _storage(self) -> Dict[str, Any]:
+        current_thread = threading.current_thread()
+        if not hasattr(current_thread, 'unsafe_storage'):
+            setattr(current_thread, 'unsafe_storage', {})
+        return current_thread.unsafe_storage
+
+    def __getattribute__(self, item):
+        try:
+            return self._storage[item]
+        except KeyError:
+            raise AttributeError
+
+    def __setattr__(self, key, value):
+        self._storage[key] = value
+
+    def __delattr__(self, item):
+        del self._storage[item]

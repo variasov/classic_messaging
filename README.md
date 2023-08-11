@@ -22,6 +22,7 @@ Publisher have inner buffer. Messages can be planned for publishing, and
 will be published later
 
 Usage with deferred publishing:
+
 ```python
 from classic.components import component
 from classic.messaging import Message, Publisher
@@ -39,8 +40,8 @@ class SomeService:
         try:
             self.create_message()
         except Exception:
-            self.publisher.reset()
-            raise 
+            self.publisher.reset_deferred()
+            raise
         else:
             self.publisher.flush()
 ```
